@@ -55,5 +55,7 @@ async def process_choiceCat_command(callback: CallbackQuery, request: Request, s
 @delete.callback_query(IsAdmin(), F.data.startswith('items_'))
 async def process_deleteCat_command(callback: CallbackQuery, request: Request):
     result = callback.data.split('_')
+    print(result, 'FFFFFFFFFFFF')
+    await request.delete_item_basket(int(result[1]), callback.from_user.id)
     await request.delete_item(int(result[1]))
     await callback.message.edit_text('Товар успешно удален', reply_markup=admin_keyboard)

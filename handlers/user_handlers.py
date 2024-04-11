@@ -19,7 +19,7 @@ user = Router()
 async def process_start_command(message: Message | CallbackQuery, request: Request):
     await request.set_user(message.from_user.id)
     if isinstance(message, Message):
-        await message.answer_photo(caption=LEXICON_RU['/start'], 
+        await message.answer_photo(caption=LEXICON_RU['/start'],
                                    photo='AgACAgIAAxkBAAIFoWYWfMrjX_wkwbstsMLkfQU7MAmgAALx3DEbio24SOG7Ovyt_1cgAQADAgADeAADNAQ',
                                    reply_markup=keyboard)
     else:
@@ -57,8 +57,8 @@ async def process_item_command(callback: CallbackQuery, callback_data: Goods, re
     print(len(items))
     try:
         await callback.message.answer_photo(photo=items[0].photo,
-                                            caption=await text_button(items[0].name, 
-                                            items[0].description, 
+                                            caption=await text_button(items[0].name,
+                                            items[0].description,
                                             items[0].price,),
                                             reply_markup=await paginator(items[0].id,callback_data.subcategory_id))
     except:
@@ -79,9 +79,9 @@ async def process_pagination_command(callback: CallbackQuery, callback_data: Pag
     with suppress(TelegramBadRequest | IndexError):
         photo = InputMediaPhoto(media=items[page].photo, caption=await text_button(items[page].name, items[page].description, items[page].price))
         await callback.message.edit_media(media=photo, reply_markup=await paginator(items[page].id, callback_data.subcategory_id, page))
-        
 
-    await callback.answer('') 
+
+    await callback.answer('')
 
 
 
@@ -89,7 +89,7 @@ async def process_pagination_command(callback: CallbackQuery, callback_data: Pag
 async def process_basketadd_command(callback: CallbackQuery, request: Request):
     result = callback.data.split('_')
     await request.add_item_basket(item_id=int(result[1]), callback=callback)
-    
+
 
 @user.callback_query(F.data == 'basket')
 async def process_basket_command(callback: CallbackQuery, request: Request):
@@ -97,8 +97,8 @@ async def process_basket_command(callback: CallbackQuery, request: Request):
     items = [await request.get_items(item_id=i.item) for i in basket]
     try:
         await callback.message.answer_photo(photo=items[0].photo,
-                                                    caption=await text_button(items[0].name, 
-                                                    items[0].description, 
+                                                    caption=await text_button(items[0].name,
+                                                    items[0].description,
                                                     items[0].price,),
                                                     reply_markup=await paginator2(items[0].id))
     except:
@@ -158,11 +158,11 @@ async def process_pagination_command(callback: CallbackQuery, request: Request, 
 @user.pre_checkout_query()
 async def checkout(pre_checkout_query: PreCheckoutQuery, bot: Bot):
     await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
-    
+
 
 @user.message(F.content_type == ContentType.SUCCESSFUL_PAYMENT)
 async def payment(message: Message, request: Request):
-    await request.delete_item_basket(int(message.successful_payment.invoice_payload))
+    await request.delete_item_basket(int(message.successful_payment.invoice_payload), message.from_user.id)
     await request.add_item_purchase(item_id=int(message.successful_payment.invoice_payload), user_id=message.from_user.id)
     msg = f'Товар успешно куплен {message.successful_payment.total_amount // 100} {message.successful_payment.currency}.' \
           f'\r\nНаш Влаdick получил заявку и взламывает ваш номер.' \
@@ -175,8 +175,8 @@ async def process_purches_command(call: CallbackQuery, request: Request):
     items = [await request.get_items(item_id=i.item) for i in purches]
     try:
         await call.message.answer_photo(photo=items[0].photo,
-                                                    caption=await text_button(items[0].name, 
-                                                    items[0].description, 
+                                                    caption=await text_button(items[0].name,
+                                                    items[0].description,
                                                     items[0].price,),
                                                     reply_markup=await paginator3())
     except:

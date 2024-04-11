@@ -21,7 +21,7 @@ class Request:
     async def get_goods(self):
         goods = await self.session.scalars(select(Category))
         return goods
-    
+
     async def get_subgoods(self, category_id=None):
 
         if category_id is None:
@@ -63,7 +63,7 @@ class Request:
         if not subcategory:
             self.session.add(Subcategory(name=name, category=category_id))
             await self.session.commit()
-    
+
     async def set_item(self, name, description, photo, price, subcategory_id):
         items = await self.session.scalar(select(Subcategory).where(and_(
             Item.subcategory_id == subcategory_id,
@@ -75,7 +75,7 @@ class Request:
             await self.session.commit()
 
     async def add_item_basket(self, item_id, callback: CallbackQuery):
-        
+
         basket = await self.session.scalar(select(Basket).where(and_(
             Basket.item == item_id,
             Basket.user == callback.from_user.id,
@@ -97,7 +97,7 @@ class Request:
         category = await self.session.scalar(select(Category).where(Category.id == category_id))
         category.name = new_name
         await self.session.commit()
-    
+
     async def edit_subcategory(self, subcategory_id: int, new_name: str | None = None, category_id: int | None = None):
         subcategory = await self.session.scalar(select(Subcategory).where(Subcategory.id == subcategory_id))
         if not category_id is None:
@@ -129,13 +129,13 @@ class Request:
                 return False
         await self.session.commit()
         return True
-       
+
     '''Удаления'''
     async def delete_category(self, category_id):
         category = await self.session.scalar(select(Category).where(Category.id == category_id))
         await self.session.delete(category)
         await self.session.commit()
-    
+
     async def delete_subcategory(self, subcategory_id):
         subcategory = await self.session.scalar(select(Subcategory).where(Subcategory.id == subcategory_id))
         await self.session.delete(subcategory)
@@ -143,12 +143,15 @@ class Request:
 
     async def delete_item(self, item_id):
         item = await self.session.scalar(select(Item).where(Item.id == item_id))
+        print(item, 'FFFFFFFFFFFFFFFFFFFFFF')
         await self.session.delete(item)
         await self.session.commit()
 
-    async def delete_item_basket(self, item_id):
-        item = await self.session.scalar(select(Basket).where(Basket.item == item_id))
-        await self.session.delete(item)
-        await self.session.commit()
-
-    
+    async def delete_item_basket(self, item_id, user_id):
+        item = await self.session.scalar(select(Basket).where(and_(
+            Basket.item == item_id,
+            Basket.user == user_id
+            )))
+        if item:
+            await self.session.delete(item)
+            await self.session.commit()
