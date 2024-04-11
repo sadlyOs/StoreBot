@@ -8,7 +8,7 @@ class Config(BaseSettings):
     BOT_TOKEN: SecretStr
     ADMIN_ID: SecretStr
     ENGINE: SecretStr
-    CLICK: SecretStr
+    UKASSA: SecretStr
 
     model_config = SettingsConfigDict(
         env_file=f"{ENV_FILE_DIR}/.env",

@@ -133,7 +133,7 @@ async def process_pagination_command(callback: CallbackQuery, request: Request, 
         title=f'Товар: {item.name}',
         description=item.description,
         payload=f'{item.id}',
-        provider_token=Config().CLICK.get_secret_value(),
+        provider_token=Config().UKASSA.get_secret_value(),
         currency='rub',
         prices=[
             LabeledPrice(
